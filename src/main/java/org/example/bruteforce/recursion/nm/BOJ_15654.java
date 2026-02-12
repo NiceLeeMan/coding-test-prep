@@ -1,4 +1,4 @@
-package org.example.bruteforce.recursion;
+package org.example.bruteforce.recursion.nm;
 
 import java.io.BufferedReader;
 import java.io.IOException;

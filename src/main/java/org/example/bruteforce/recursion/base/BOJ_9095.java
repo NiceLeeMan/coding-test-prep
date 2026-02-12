@@ -1,4 +1,4 @@
-package org.example.bruteforce.recursion;
+package org.example.bruteforce.recursion.base;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,7 +42,8 @@ public class BOJ_9095 {
     }
 
 
-    //재귀를 통해 푼 방식(Top-Down)
+    //f(n)에게 n을 1,2,3의 합으로 나타낼수 있는 수를 구하라고 시킨다.
+
     public static int fn(int n){
         if(n == 1) return 1;
         if(n == 2) return 2;

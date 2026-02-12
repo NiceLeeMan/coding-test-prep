@@ -1,11 +1,11 @@
-package org.example.bruteforce.recursion;
+package org.example.bruteforce.recursion.nm;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
-public class BOJ_15652 {
+public class BOJ_15651 {
 
     static int N;
     static int M;
@@ -20,11 +20,11 @@ public class BOJ_15652 {
         M = Integer.parseInt(st.nextToken());
 
         arr = new int[M];
-        dfs(0,1);
+        dfs(0);
         System.out.println(sb);
     }
 
-    public static void dfs(int idx,int start){
+    public static void dfs(int idx){
 
         if(idx == M){
             for(int val : arr){
@@ -34,9 +34,9 @@ public class BOJ_15652 {
             return;
         }
 
-        for(int i=start; i<=N; i++){
+        for(int i = 1; i <= N; i++){
             arr[idx] = i;
-            dfs(idx+1,i);
+            dfs(idx+1);
         }
 
     }

@@ -1,4 +1,4 @@
-package org.example.bruteforce;
+package org.example.bruteforce.recursion.nm;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -78,20 +78,6 @@ public class BOJ_15649 {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
