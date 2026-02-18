@@ -5,20 +5,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
-
-/**
- * [문제 분석 및 필수 사고 과정 정리]
- *  N == 15, 시간 제한 2초여서 브루트 포스로 접근가능하다고 생각함.
- *  나의 선택에 따라 최대결과를 도출한다는 특징이있어서 베낭알고리즘 같다고 생각했음.
- *  깨달은 점은 재귀함수로 문제를 정의할때, 반복되는 행동의 단위를 발견한뒤, 그것을 함수로 만드는게 핵심인듯.
- *  이 문제는 선택과 결과의 최대값을 일일단위로 반복하기에 선택을 재귀함수로 만들었음.
- */
 public class BOJ_14501 {
 
-    static int N;
-    static int[][] arr;
-
-
+    static int N; //백준이가 일을 하는 기간 (Day)
+    static int[][] arr; // 백준의 상담표 row: 날짜 정보, cols: Ti & Pi
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -26,71 +16,69 @@ public class BOJ_14501 {
 
         N = Integer.parseInt(br.readLine());
 
-        arr = new int[N+1][2];
+        arr = new int[N + 1][2];
 
-        for(int i=1; i<=N; i++){
+        for (int i = 1; i <= N; i++) {
             st = new StringTokenizer(br.readLine());
             arr[i][0] = Integer.parseInt(st.nextToken());
             arr[i][1] = Integer.parseInt(st.nextToken());
         }
 
-        System.out.println(solve(1));
-
-
-    }
-
-    static int solve(int day) {
-        // 1. 기저 사례: 퇴사일(N+1)에 딱 맞춰 도달 -> 더 이상 상담 불가, 수익 0 반환
-        if (day == N + 1) {
-            return 0;
-        }
-
-        // 2. 기저 사례: 퇴사일을 넘겨버림 -> 불가능한 경우, 매우 작은 값 반환 (Max 계산에서 탈락시킴)
-        if (day > N + 1) return -99999999;
-        // [핵심 로직]
-        // 경우 1: 오늘 상담을 안 하고 다음 날로 넘어감 (Skip)
-        // 수익: 0 + 나머지 날짜의 최대 수익
-        int option1 = solve(day + 1);
-        // 경우 2: 오늘 상담을 함 (Take)
-        // 수익: 오늘 상담료(arr[day][1]) + 상담이 끝난 날짜(day + arr[day][0])부터의 최대 수익
-        int option2 = arr[day][1] + solve(day + arr[day][0]);
-
-        // 두 경우 중 더 큰 이득을 선택
-        return Math.max(option1, option2);
+        System.out.println(solvedByLoop());
     }
 
     /**
-     * 반복문을 이용한 풀이 (Forward DP)
-     * - 관점: 1일차부터 시작해서 수익을 미래(Next Day)로 밀어주는(Push) 방식
-     * - 시간 복잡도: O(N)
+     * day일에 상담을 할지 말지 선택하고, 그 결과로 얻을 수 있는 최대 수익을 구한다.
+     *
+     * @param day: 현재 선택해야 하는 날짜 (1부터 시작)
+     * @return: day일부터 N일까지 얻을 수 있는 최대 수익
      */
-    static int solveIterative() {
-        // dp[i]: i일차 아침에 가질 수 있는 최대 수익
-        // N+1일(퇴사일)까지 계산해야 하므로 크기를 N+2로 설정
-        int[] dp = new int[N + 2];
+    public static int solvedByRecursion(int day) {
 
-        for (int i = 1; i <= N; i++) {
-
-            // [Case 1] 오늘(i일) 상담을 안 하는 경우
-            // 행동: 오늘까지 번 돈(dp[i])을 그대로 내일(dp[i+1])로 가져간다.
-            // 논리: 내일의 기존 값과 비교하여 더 큰 쪽을 선택 (Math.max)
-            dp[i + 1] = Math.max(dp[i + 1], dp[i]);
-
-            // [Case 2] 오늘(i일) 상담을 하는 경우
-            // 조건: 상담이 끝나는 날(nextDay)이 퇴사일(N+1)을 넘지 않아야 함
-            int nextDay = i + arr[i][0]; // 걸리는 기간(T) 더하기
-            int income = arr[i][1];      // 상담 금액(P)
-
-            if (nextDay <= N + 1) {
-                // 행동: (오늘까지 번 돈 + 이번 상담 수익)을 상담 끝나는 날에 기록한다.
-                // 논리: 기존에 그 날짜에 기록된 수익과 비교하여 갱신
-                dp[nextDay] = Math.max(dp[nextDay], dp[i] + income);
-            }
+        // 퇴사날짜를 초과하는 상담은 포함하지 않음.
+        if (day > N) {
+            return Integer.MIN_VALUE;
         }
 
-        // 퇴사일(N+1)에 도달했을 때 쌓인 최종 최대 수익 반환
-        return dp[N + 1];
+        //상담을 한 경우, 오늘 소득을 받고, 다음 날짜로 넘어간다.
+        int option1 = arr[day][1] + solvedByRecursion(day + arr[day][0]);
+
+        //상담을 진행하지 않은 경우, 다음 날로 넘어간다.
+        int option2 = solvedByRecursion(day + 1);
+
+        return Math.max(option1, option2);
+
     }
+
+    /**
+     * 1)반복문을 통한 풀이는, 시작할 날짜 day부터 ~ N일까지 에 대해 선택
+     *
+     * */
+    public static int solvedByLoop(){
+
+        int[] dp = new int[N + 2]; // i일부터 마지막날까지, 최적으로 선택했을 때의 최대 수익
+
+        //i일에 상담을 시작해서 최대 수익을 계산하는 함수.
+        for(int i = N; i>=1; i--){
+
+            int option1; //오늘 상담을 했을 때, 오늘부터 마지막날까지 얻는 총 수익
+            int option2; // 오늘 상담을 안 했을 때, 오늘부터 마지막날까지 얻는 총 수익
+
+            if(i + arr[i][0] <= N+1){ //오늘 시작한 상담일이 마지막날을 초과하는 경우
+                option1 = arr[i][1] + dp[i+arr[i][0]]; // 상담을 해서 돈을 벌었음.
+            }else{
+                option1 = 0;
+            }
+
+            option2 = dp[i+1]; // 다음날부터 얻을 수 있는 최대 수익
+
+            dp[i] = Math.max(option1, option2);
+
+        }
+
+        return dp[1];
+    }
+
 
 
 }
